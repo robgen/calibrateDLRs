@@ -6,7 +6,6 @@ function [obj, CDFsLoss] = objectiveFunction(DLRdata, IMstripes, ...
 
 meanDLRs = [0 DLRdata(1:numel(DLRdata)/2)'];
 covDLRs = [0 DLRdata(numel(DLRdata)/2+1:end)'];
-maxOrderMoments = size(empiricalLossGivenIMmoments,1);
 
 fragilities = getFragilities(IMstripes, fragMedian, fragStd);
 CDFsLoss = getCDRlossGivenIM(fragilities, meanDLRs, covDLRs);
@@ -16,8 +15,8 @@ lossGivenIMsamples = getLRgivenIMsamples(CDFsLoss, Nsamples);
 % pValues = runKStests(lossGivenIMsamples, empiricalLossGivenIMsamples);
 % obj = combinePvalues(pValues);
 
-
 % check with central moments
+maxOrderMoments = size(empiricalLossGivenIMmoments,1);
 guessedMoments = getLRgivenIMmoments(lossGivenIMsamples, maxOrderMoments);
 obj = combineMoments(guessedMoments, empiricalLossGivenIMmoments, weightMoments);
 
@@ -105,9 +104,6 @@ end
 function lossGivenIMmoments = getLRgivenIMmoments(lossGivenIMsamples, maxOrder)
     
 for im = size(lossGivenIMsamples,2) : -1 : 1
-%     for o = maxOrder : -1 : 1
-%         lossGivenIMmoments(o,im) = moment(lossGivenIMsamples(:,im), o);
-%     end
     lossGivenIMmoments(1,im) = mean(lossGivenIMsamples(:,im));
     lossGivenIMmoments(2,im) = var(lossGivenIMsamples(:,im));
     lossGivenIMmoments(3,im) = skewness(lossGivenIMsamples(:,im));
@@ -132,6 +128,7 @@ for im = size(lossGivenIMsamples,2) : -1 : 1
         lossGivenIMsamples(:,im), empiricalLossGivenIMsamples(:,im));
 end
 
+pValues = 10^100 * pValues;
 end
 
 
