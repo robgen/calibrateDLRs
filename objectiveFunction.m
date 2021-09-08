@@ -11,14 +11,14 @@ fragilities = getFragilities(IMstripes, fragMedian, fragStd);
 CDFsLoss = getCDRlossGivenIM(fragilities, meanDLRs, covDLRs);
 lossGivenIMsamples = getLRgivenIMsamples(CDFsLoss, Nsamples);
 
-% % check with discrete KS test
-% pValues = runKStests(lossGivenIMsamples, empiricalLossGivenIMsamples);
-% obj = combinePvalues(pValues);
+% check with discrete KS test
+pValues = runKStests(lossGivenIMsamples, empiricalLossGivenIMsamples);
+obj = combinePvalues(pValues);
 
-% check with central moments
-maxOrderMoments = size(empiricalLossGivenIMmoments,1);
-guessedMoments = getLRgivenIMmoments(lossGivenIMsamples, maxOrderMoments);
-obj = combineMoments(guessedMoments, empiricalLossGivenIMmoments, weightMoments);
+% % check with central moments
+% maxOrderMoments = size(empiricalLossGivenIMmoments,1);
+% guessedMoments = getLRgivenIMmoments(lossGivenIMsamples, maxOrderMoments);
+% obj = combineMoments(guessedMoments, empiricalLossGivenIMmoments, weightMoments);
 
 end
 
@@ -128,7 +128,6 @@ for im = size(lossGivenIMsamples,2) : -1 : 1
         lossGivenIMsamples(:,im), empiricalLossGivenIMsamples(:,im));
 end
 
-pValues = 10^100 * pValues;
 end
 
 
