@@ -4,6 +4,7 @@ function [obj, CDFsLoss] = objectiveFunction(DLRdata, IMstripes, ...
                                  fragMedian, fragStd, ...
                                  Nsamples, weightMoments)
 
+DLRdata = DLRdata(:);
 meanDLRs = [0 DLRdata(1:numel(DLRdata)/2)'];
 covDLRs = [0 DLRdata(numel(DLRdata)/2+1:end)'];
 

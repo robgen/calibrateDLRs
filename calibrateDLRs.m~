@@ -139,39 +139,7 @@ classdef calibrateDLRs
         function plotVulnerability(self)
             
             if ~isempty(self.DLRdataNLO)
-                finalVulnerability(:,1) = self.IMstripes;
-                finalVulnerability(:,2) = mean(1-self.CDFsLossNLO.CDFlossIM, 2);
-                
-                figure; hold on
-                for im = 1 : numel(self.IMstripes)
-                    s = scatter(self.IMstripes(im)*ones(size(self.LRgivenIM,1),1), ...
-                        self.LRgivenIM(:,im), 5, 'k', 'filled');
-                end
-                
-                p = plot(finalVulnerability(:,1), finalVulnerability(:,2), ...
-                    'r', 'LineWidth', 2);
-                
-                f = scatter(self.fragMedian, ...
-                    interp1(finalVulnerability(:,1), finalVulnerability(:,2), ...
-                    self.fragMedian), 100, 'filled');
-                
-                legend([s,p,f], {'Empirical', 'Vulnerability', 'Frag. Medians'})
-                
-                for ds = numel(self.fragMedian) : -1 : 1
-                    strDLR{ds} = sprintf(...
-                        'DLR_{%d}=%1.2f%%(%1.2f)', ds, self.DLRdataNLO(ds), ...
-                        self.DLRdataNLO(numel(self.fragMedian)+ds));
-                end
-                annotation(gcf,'textbox',...
-                    [0.54742857142857 0.140476190476191 0.313285714285716 0.288095238095239],...
-                    'String',strDLR,'LineStyle','none',...
-                    'FontSize',18,'FontName','Helvetica Neue','FitBoxToText','off');
-                
-                xlabel('IM [g]')
-                ylabel('Loss Ratio [-]')
-                set(gca, 'FontSize' ,18)
-                
-                title('Nonlinear Optimisation')
+
             else
                 warning('Nonlinear optimisation was not run. Can''t plot it')
             end
@@ -184,7 +152,7 @@ classdef calibrateDLRs
                 figure; hold on
                 for im = 1 : numel(self.IMstripes)
                     s = scatter(self.IMstripes(im)*ones(size(self.LRgivenIM,1),1), ...
-                        self.LRgivenIM(:,im), 5, 'k', 'filled');
+                        self.LRgivenIM(:,im), 5, 'k');
                 end
                 
                 p = plot(finalVulnerability(:,1), finalVulnerability(:,2), ...
@@ -194,7 +162,7 @@ classdef calibrateDLRs
                     interp1(finalVulnerability(:,1), finalVulnerability(:,2), ...
                     self.fragMedian), 100, 'filled');
                 
-                legend([s,p,f], {'Empirical', 'Vulnerability', 'Frag. Medians'})
+                legend([s,p,f], {'Empirical', 'Vulnerability', 'fragMedians'})
                 
                 for ds = numel(self.fragMedian) : -1 : 1
                     strDLR{ds} = sprintf(...
@@ -209,10 +177,8 @@ classdef calibrateDLRs
                 xlabel('IM [g]')
                 ylabel('Loss Ratio [-]')
                 set(gca, 'FontSize' ,18)
-                
-                title('Particle Swarm Optimisation')
             else
-                warning('Particle swarm optimisation was not run. Can''t plot it')
+                warning('Nonlinear optimisation was not run. Can''t plot it')
             end
             
         end

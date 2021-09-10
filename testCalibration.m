@@ -29,49 +29,16 @@ for im = 1 : numel(IMstripes)
     LRgivenIM(:,im) = interp1([0 inputCDFloss.CDFlossIM(im,:)], ...
         [0; eps; inputCDFloss.LOSSdef(2:end)], unifRand(:,im));
 end
-   
-for im = numel(IMstripes) : -1 : 1
-    empiricalMoments(1,im) = mean(LRgivenIM(:,im));
-    empiricalMoments(2,im) = var(LRgivenIM(:,im));
-    empiricalMoments(3,im) = skewness(LRgivenIM(:,im));
-    empiricalMoments(4,im) = kurtosis(LRgivenIM(:,im));
-end
 
-%% Map objective function changing only parameters of one ds
+%% Run
 
-DS = 1;
+calibrator = calibrateDLRs(fragMedian, fragStd, IMstripes, LRgivenIM, Nsamples);
 
-Nseed = 100;
-[MLR, COV] = meshgrid(linspace(0.01, 0.9, Nseed), linspace(0.01, 1.5, Nseed));
+calibrator = calibrator.nonLinearOptimisation;
+errNLO = abs(targetDLRdata - calibrator.DLRdataNLO) ./ targetDLRdata * 100;
 
-seedDLRdata = targetDLRdata;
-for row = Nseed : -1 : 1
-    for col = Nseed : -1 : 1
-        seedDLRdata([DS,numel(fragMedian)+DS]) = [MLR(row,col) COV(row,col)];
-        
-        OBJ(row, col) = objectiveFunction(seedDLRdata, ...
-                        IMstripes, LRgivenIM, empiricalMoments, ...
-                        fragMedian, fragStd, ...
-                        Nsamples, weightMoments);
-    end
-end
+calibrator = calibrator.particleSwarm;
+errPSO = abs(targetDLRdata - calibrator.DLRdataPSO) ./ targetDLRdata * 100;
 
-[~, indMin] = min(OBJ(:));
-
-figure
-surf(MLR, COV, OBJ); hold on
-scatter3(MLR(indMin), COV(indMin), OBJ(indMin), 150, 'k', 'filled')
-xlabel(sprintf('MLR(DS_%d)', DS))
-ylabel(sprintf('CoV(DS_%d)', DS))
-zlabel('Objective function')
-set(gca, 'FontSize', 18)
-
-%% Run optimisation based on the dummy data
-
-close all
-startDLRdata = rand(6,1);
-optimiseDLRs
-plotDLRs
-
-% Verify
-err = abs(targetDLRdata - finalDLRdata) ./ targetDLRdata * 100
+calibrator = calibrator.mapObjective(targetDLRdata);
+calibrator.plotObjective;
