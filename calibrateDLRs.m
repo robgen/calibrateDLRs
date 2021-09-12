@@ -99,12 +99,17 @@ classdef calibrateDLRs
             [~, self.CDFsLossNLO] = self.objFun(self.DLRdataNLO);
         end
         
-        function self = particleSwarm(self)
+        function self = particleSwarm(self, options)
+            
+            if nargin < 2
+                options = optimoptions('particleswarm', ...
+                    'Display', 'iter', 'FunctionTolerance', 10e-10);
+            end
             
             Nvars = 2*numel(self.fragMedian);
             
-            DLRdata = particleswarm(...
-                self.objFun, Nvars, self.lowerBound, self.upperBound);
+            DLRdata = particleswarm(self.objFun, Nvars, ...
+                self.lowerBound, self.upperBound, options);
             
             self.DLRdataPSO = DLRdata(:);
             
@@ -119,12 +124,11 @@ classdef calibrateDLRs
             end
             
             for DS = 1 : numel(self.fragMedian)
-                
                 MLR = self.mappedMLR(:,:,DS);
                 COV = self.mappedCOV(:,:,DS);
                 OBJ = self.mappedObj(:,:,DS);
                 [~, indMin] = min(OBJ(:));
-                
+                                
                 figure
                 surf(MLR, COV, OBJ); hold on
                 scatter3(MLR(indMin), COV(indMin), OBJ(indMin), 150, 'k', 'filled')
@@ -135,7 +139,7 @@ classdef calibrateDLRs
             end
             
         end
-
+        
         function plotVulnerability(self)
             
             if ~isempty(self.DLRdataNLO)
@@ -217,6 +221,26 @@ classdef calibrateDLRs
             
         end
         
+        function plotLRgivenIMdistributions(self, optMethod)
+            
+            for im = 1 : numel(self.IMstripes)
+                
+                clear empCDF
+                
+                figure('Position', [841   27   560   420]); hold on
+                [empCDF(:,2), empCDF(:,1)] = ecdf(self.LRgivenIM(:,im));
+                plot(empCDF(:,1), empCDF(:,2), '--', 'Color', 'k', 'LineWidth', 2)
+                plot(self.(['CDFsLoss' optMethod]).LOSSdef, ...
+                    self.(['CDFsLoss' optMethod]).CDFlossIM(im,:), ...
+                    'Color', 'k', 'LineWidth', 2)
+                xlabel('Loss Ratio, lr [-]')
+                ylabel('P(LR\leqlr) [-]')
+                set(gca, 'FontSize' ,18)
+                legend('Empirical', 'Fitted', 'Location', 'SouthEast')
+                title(sprintf('IM=%2.4f', self.IMstripes(im)))
+            end
+        end
+        
         %% Micro methods
         
         function self = setConstraints(self)
@@ -243,4 +267,3 @@ classdef calibrateDLRs
         
     end
 end
-

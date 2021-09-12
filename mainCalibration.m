@@ -17,4 +17,8 @@ calibrator = calibrateDLRs(fragMedian, fragStd, IMstripes, LRgivenIM);
 calibrator = calibrator.nonLinearOptimisation;
 calibrator = calibrator.particleSwarm;
 
+calibrator = calibrator.mapObjective(calibrator.DLRdataPSO);
+calibrator.plotObjective
+
 calibrator.plotVulnerability
+calibrator.plotLRgivenIMdistributions('PSO')
