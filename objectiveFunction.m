@@ -13,8 +13,12 @@ CDFsLoss = getCDRlossGivenIM(fragilities, meanDLRs, covDLRs);
 lossGivenIMsamples = getLRgivenIMsamples(CDFsLoss, Nsamples);
 
 % check with discrete KS test
-pValues = runKStests(lossGivenIMsamples, empiricalLossGivenIMsamples);
+[pValues, ksStats] = runKStests(...
+    lossGivenIMsamples, empiricalLossGivenIMsamples);
 obj = combinePvalues(pValues);
+
+% weights = ones(1,numel(ksStats));
+% obj = combineKSstatistics(ksStats, weights);
 
 % % check with central moments
 % maxOrderMoments = size(empiricalLossGivenIMmoments,1);
@@ -122,10 +126,11 @@ obj = sum(sum( targetVector.^2 ));
 end
 
 
-function pValues = runKStests(lossGivenIMsamples, empiricalLossGivenIMsamples)
+function [pValues, ksStats] = runKStests(...
+    lossGivenIMsamples, empiricalLossGivenIMsamples)
 
 for im = size(lossGivenIMsamples,2) : -1 : 1
-    [~, pValues(im)] = kstest2(...
+    [~, pValues(im), ksStats(im)] = kstest2(...
         lossGivenIMsamples(:,im), empiricalLossGivenIMsamples(:,im));
 end
 
@@ -136,4 +141,9 @@ function obj = combinePvalues(pValues)
     
     % minimise the negative = maximise
     obj = sum(-pValues);
+end
+
+function obj = combineKSstatistics(ksStats, weights)
+    
+    obj = sum(ksStats .* weights);
 end
