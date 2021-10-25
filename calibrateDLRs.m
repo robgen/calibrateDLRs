@@ -255,14 +255,12 @@ classdef calibrateDLRs
             self.A = [A1, A2; A2, A3];
             self.B = zeros(2*Nds,1);
             
-            % Aeq*X = Beq
-            self.Aeq = [];
-            self.Beq = [];
+kar
             
             % bounds
             self.lowerBound = 0.001 * ones(2*Nds,1);
-            self.upperBound = [linspace(0.2,0.99,Nds)'; 1*ones(Nds,1)]; 
-            warning('check definition of lowerBounds for DLR')
+            self.upperBound = [0.999*ones(Nds,1); 1*ones(Nds,1)]; 
+            warning('add optional input for lowerBounds of DLR')
             
         end
         
