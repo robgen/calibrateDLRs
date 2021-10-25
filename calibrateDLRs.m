@@ -255,7 +255,9 @@ classdef calibrateDLRs
             self.A = [A1, A2; A2, A3];
             self.B = zeros(2*Nds,1);
             
-kar
+            % Aeq*X = Beq
+            self.Aeq = [];
+            self.Beq = [];
             
             % bounds
             self.lowerBound = 0.001 * ones(2*Nds,1);
