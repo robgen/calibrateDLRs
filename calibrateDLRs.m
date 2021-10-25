@@ -261,7 +261,8 @@ classdef calibrateDLRs
             
             % bounds
             self.lowerBound = 0.001 * ones(2*Nds,1);
-            self.upperBound = [[0.2 0.7 0.99]'; 1*ones(Nds,1)]; warning('make me independent of the number of DSs')
+            self.upperBound = [linspace(0.2,0.99,Nds)'; 1*ones(Nds,1)]; 
+            warning('check definition of lowerBounds for DLR')
             
         end
         

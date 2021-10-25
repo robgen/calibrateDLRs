@@ -86,8 +86,6 @@ for im = size(CDFsLoss.CDFlossIM,1) : -1 : 1
     rawECDF = [ CDFsLoss.LOSSdef, CDFsLoss.CDFlossIM(im,:)' ];
     [~,in] = unique(rawECDF(:,2));
     ECDF = rawECDF(in,:);
-    
-    lossGivenIMsamples(:,im) = ECDFsampler(ECDF, rand(Nsamples,1));
 end
 
 end
