@@ -32,16 +32,18 @@ classdef calibrateDLRs
     methods
         
         function self = calibrateDLRs(fragMedian, fragStd, ...
-                IMstripes, LRgivenIM, NsamplesLRgivenIM)
+                IMstripes, LRgivenIM, NsamplesLRgivenIM, boundsDLR, boundsCoV)
             
             if nargin < 5; NsamplesLRgivenIM = 10000; end
+            if nargin < 6; boundsDLR = 0; end
+            if nargin < 7; boundsCoV = 0; end
             
             self.fragMedian = fragMedian;
             self.fragStd = fragStd;
             self.IMstripes = IMstripes;
             self.LRgivenIM = LRgivenIM;
             
-            self = self.setConstraints;
+            self = self.setConstraints(boundsDLR, boundsCoV);
             
             % irrelevant - to be removed after changing objFx
             empiricalMoments = rand(4, numel(self.IMstripes));
@@ -124,24 +126,18 @@ classdef calibrateDLRs
             end
             
             for DS = 1 : numel(self.fragMedian)
-                
                 MLR = self.mappedMLR(:,:,DS);
                 COV = self.mappedCOV(:,:,DS);
                 OBJ = self.mappedObj(:,:,DS);
                 [~, indMin] = min(OBJ(:));
-                
-                [~, indBase] = min(abs(self.mappedMLR(:,:,DS) - self.));
-                
+                                
                 figure
                 surf(MLR, COV, OBJ); hold on
                 scatter3(MLR(indMin), COV(indMin), OBJ(indMin), 150, 'k', 'filled')
-                scatter3(MLR(indMin), COV(indMin), OBJ(indMin), 150, 'r', 'filled')
                 xlabel(sprintf('MLR(DS_%d)', DS))
                 ylabel(sprintf('CoV(DS_%d)', DS))
                 zlabel('Objective function')
                 set(gca, 'FontSize', 18)
-                
-                legend('Map', 'Optimum', 'Baseline')
             end
             
         end
@@ -249,7 +245,7 @@ classdef calibrateDLRs
         
         %% Micro methods
         
-        function self = setConstraints(self)
+        function self = setConstraints(self, boundsDLR, boundsCoV)
             
             Nds = numel(self.fragMedian);
             
@@ -266,11 +262,11 @@ classdef calibrateDLRs
             self.Beq = [];
             
             % bounds
-            self.lowerBound = 0.001 * ones(2*Nds,1);
-            self.upperBound = [[0.2 0.7 0.99]'; 1*ones(Nds,1)]; warning('make me independent of the number of DSs')
+            self.lowerBound = [boundsDLR(1:Nds,1); boundsCoV(1:Nds,1)];
+            self.upperBound = [boundsDLR(1:Nds,2); boundsCoV(1:Nds,2)];
+            warning('add optional input for lowerBounds of DLR')
             
         end
         
     end
 end
-

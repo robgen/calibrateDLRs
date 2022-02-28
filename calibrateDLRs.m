@@ -32,16 +32,25 @@ classdef calibrateDLRs
     methods
         
         function self = calibrateDLRs(fragMedian, fragStd, ...
-                IMstripes, LRgivenIM, NsamplesLRgivenIM)
+                IMstripes, LRgivenIM, NsamplesLRgivenIM, boundsDLR, boundsCoV)
             
             if nargin < 5; NsamplesLRgivenIM = 10000; end
+            if nargin < 6
+                boundsDLR(:,1) = 0.001*ones(numel(fragMedian),1);
+                boundsDLR(:,2) = 0.999*ones(numel(fragMedian),1);
+            end
+            if nargin < 7
+                boundsCoV(:,1) = 0.001*ones(numel(fragMedian),1);
+                boundsCoV(:,2) = 1*ones(numel(fragMedian),1);
+            end
             
             self.fragMedian = fragMedian;
             self.fragStd = fragStd;
             self.IMstripes = IMstripes;
             self.LRgivenIM = LRgivenIM;
             
-            self = self.setConstraints;
+            % eps serves to avoid issues with meandDLR=1
+            self = self.setConstraints(boundsDLR-eps, boundsCoV);
             
             % irrelevant - to be removed after changing objFx
             empiricalMoments = rand(4, numel(self.IMstripes));
@@ -103,7 +112,7 @@ classdef calibrateDLRs
             
             if nargin < 2
                 options = optimoptions('particleswarm', ...
-                    'Display', 'iter', 'FunctionTolerance', 10e-10);
+                    'Display', 'iter', 'FunctionTolerance', 1e-12);
             end
             
             Nvars = 2*numel(self.fragMedian);
@@ -243,7 +252,7 @@ classdef calibrateDLRs
         
         %% Micro methods
         
-        function self = setConstraints(self)
+        function self = setConstraints(self, boundsDLR, boundsCoV)
             
             Nds = numel(self.fragMedian);
             
@@ -260,9 +269,8 @@ classdef calibrateDLRs
             self.Beq = [];
             
             % bounds
-            self.lowerBound = 0.001 * ones(2*Nds,1);
-            self.upperBound = [0.999*ones(Nds,1); 1*ones(Nds,1)]; 
-            warning('add optional input for lowerBounds of DLR')
+            self.lowerBound = [boundsDLR(1:Nds,1); boundsCoV(1:Nds,1)];
+            self.upperBound = [boundsDLR(1:Nds,2); boundsCoV(1:Nds,2)];
             
         end
         

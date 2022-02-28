@@ -77,6 +77,10 @@ CDFsLoss.CDFlossIM = sum( CDFlossDSmatrix .* probDS3d, 3 );
 % add P(L<l|Dsk) to the structure
 CDFsLoss.CDFlossDS = squeeze(CDFlossDSmatrix(1,:,:));
 
+if any(any(isnan(CDFsLoss.CDFlossIM)))
+    a = 0;
+end
+
 end
 
 
@@ -89,7 +93,6 @@ for im = size(CDFsLoss.CDFlossIM,1) : -1 : 1
     
 
     lossGivenIMsamples(:,im) = ECDFsampler(ECDF, rand(Nsamples,1));
-
 end
 
 end
