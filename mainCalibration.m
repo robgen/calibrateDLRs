@@ -6,7 +6,6 @@
 
 fragMedian = [0.0576 0.1642 0.2301 0.3404];
 fragStd = [0.3049 0.1924 0.2018 0.2041];
-startDLRdata = [[1 15 40 70]/100, 0.1 0.1 0.1 0.1]'; warning('am I using it?')
 
 IMstripes = [0.052541 0.069785 0.096096 0.11577 0.1644 0.25819 0.29656 0.34869 0.40452 0.50184 0.58843];
 
@@ -23,7 +22,7 @@ boundsCoV(:,2) = [1 1 1 1];
 %% Run
 
 calibrator = calibrateDLRs(fragMedian, fragStd, IMstripes, LRgivenIM, ...
-    NsamplesLRgivenIM, boundsDLR);
+    NsamplesLRgivenIM, boundsDLR, boundsCoV);
 
 %calibrator = calibrator.nonLinearOptimisation;
 calibrator = calibrator.particleSwarm;
